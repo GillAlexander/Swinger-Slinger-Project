@@ -13,9 +13,10 @@ namespace Jonathan
         public GameObject cube;
 
         [SerializeField] AnimationCurve animationCurve = default;
+
         void Start()
         {
-            mainCamera = FindObjectOfType<Camera>();
+            mainCamera = GetComponent<Camera>();
             mainCamera.transform.LookAt(cube.transform.position);
         }
 
@@ -24,7 +25,7 @@ namespace Jonathan
             CameraPositionSwitcher();
         }
 
-        private void CameraPositionSwitcher()
+        private void CameraPositionSwitcher() // Rework this shit 
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
@@ -39,11 +40,11 @@ namespace Jonathan
                 placement--;
                 if (placement == -1)
                 {
-                    placement = 0;
+                    placement = 3;
                 }
             }
 
-            mainCamera.transform.position = cameraPositions[placement];
+            mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, cameraPositions[placement], 0.04f);
             mainCamera.transform.LookAt(cube.transform.position);
         }
 
