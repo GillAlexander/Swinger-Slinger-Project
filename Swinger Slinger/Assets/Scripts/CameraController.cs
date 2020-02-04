@@ -7,10 +7,10 @@ namespace Jonathan
 {
     public class CameraController : MonoBehaviour
     {
-        [SerializeField] Camera mainCamera;
+        [SerializeField] Camera mainCamera = default;
         [SerializeField] Vector3[] cameraPositions = new Vector3[4];
         [SerializeField] int placement = default;
-        public GameObject cube;
+        public GameObject cube = default;
 
         [SerializeField] AnimationCurve animationCurve = default;
 
