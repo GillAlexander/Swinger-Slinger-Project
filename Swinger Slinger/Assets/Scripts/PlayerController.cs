@@ -4,26 +4,13 @@ using UnityEngine;
 
 namespace Jonathan
 {
-    public class PlayerController : MonoBehaviour
-    {
-        [SerializeField] private float speed;
+    public class PlayerController : ButtonController
+{
+        [SerializeField] private float speed = default;
         private Rigidbody playerRb = default;
-        private Transform playerTransform;
+        private Transform playerTransform = default;
         private Camera camera = default;
 
-        private bool leftMouseButtonHeldDown = false;
-        private bool leftMouseButonPressed = false;
-        private bool leftMouseButtonReleased = false;
-        private bool rightMouseButtonHeldDown = false;
-        private bool rightMouseButtonPressed = false;
-        private bool rightMouseButtonReleased = false;
-
-        public bool LeftMouseButtonHeldDown { get => leftMouseButtonHeldDown; set => leftMouseButtonHeldDown = value; }
-        public bool LeftMouseButonPressed { get => leftMouseButonPressed; set => leftMouseButonPressed = value; }
-        public bool LeftMouseButtonReleased { get => leftMouseButtonReleased; set => leftMouseButtonReleased = value; }
-        public bool RightMouseButtonHeldDown { get => rightMouseButtonHeldDown; set => rightMouseButtonHeldDown = value; }
-        public bool RightMouseButtonPressed { get => rightMouseButtonPressed; set => rightMouseButtonPressed = value; }
-        public bool RightMouseButtonReleased { get => rightMouseButtonReleased; set => rightMouseButtonReleased = value; }
 
         void Start()
         {
@@ -50,6 +37,8 @@ namespace Jonathan
             {
                 playerRb.velocity = camera.transform.right * speed;
             }
+
+            
 
             leftMouseButtonHeldDown = Input.GetMouseButton(0) ? true : false;
             leftMouseButonPressed = Input.GetMouseButtonDown(0) ? true : false;

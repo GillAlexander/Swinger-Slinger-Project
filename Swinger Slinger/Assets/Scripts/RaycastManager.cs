@@ -2,32 +2,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RaycastManager : MonoBehaviour
+namespace Jonathan
 {
-    private Camera mainCamera = default;
-    private Ray ray = default;
-    private RaycastHit raycastHit = default;
-
-    void Start()
+    public class RaycastManager : MonoBehaviour
     {
-        mainCamera = GetComponent<Camera>();
-    }
+        private Camera mainCamera = default;
+        private Ray ray = default;
+        private RaycastHit raycastHit = default;
 
-    void Update()
-    {
-        UpdateRay();
-        if (Physics.Raycast(ray))
+        void Start()
         {
-            Debug.Log($"Raycast hit {ray}");
+            mainCamera = GetComponent<Camera>();
         }
-        Debug.DrawRay(ray.origin, ray.direction * 30f, Color.blue);
-    }
 
-    private void UpdateRay()
-    {
-        //if (true)
-        //{
-            ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        //}
+        void Update()
+        {
+            UpdateRay();
+            if (Physics.Raycast(ray))
+            {
+                Debug.Log($"Raycast hit {ray}");
+            }
+            Debug.DrawRay(ray.origin, ray.direction * 30f, Color.blue);
+        }
+
+        private void UpdateRay()
+        {
+            //if (true)
+            //{
+                ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            //}
+        }
     }
 }
