@@ -9,7 +9,7 @@ namespace Jonathan
         private Camera mainCamera = default;
         private Ray ray = default;
         private RaycastHit raycastHit = default;
-
+        
         void Start()
         {
             mainCamera = GetComponent<Camera>();
@@ -17,10 +17,14 @@ namespace Jonathan
 
         void Update()
         {
-            UpdateRay();
-            if (Physics.Raycast(ray))
+            if (Time.frameCount % 8)
             {
-                Debug.Log($"Raycast hit {ray}");
+
+            }
+            UpdateRay();
+            if (Physics.Raycast(ray, out raycastHit))
+            {
+                Debug.Log(raycastHit.transform.GetComponent<IInteractable>());
             }
             Debug.DrawRay(ray.origin, ray.direction * 30f, Color.blue);
         }

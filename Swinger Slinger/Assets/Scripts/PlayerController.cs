@@ -11,7 +11,6 @@ namespace Jonathan
         private Transform playerTransform = default;
         private Camera camera = default;
 
-
         void Start()
         {
             playerRb = GetComponent<Rigidbody>();
@@ -21,31 +20,49 @@ namespace Jonathan
 
         void Update() // Lookover this shit
         {
-            if (Input.GetButton("Forward"))
+            LeftMouseButtonHeldDown = Input.GetMouseButton(0) ? true : false;
+            LeftMouseButonPressed = Input.GetMouseButtonDown(0) ? true : false;
+            LeftMouseButtonReleased = Input.GetMouseButtonUp(0) ? true : false;
+            RightMouseButtonHeldDown = Input.GetMouseButton(1) ? true : false;
+            RightMouseButtonPressed = Input.GetMouseButtonDown(1) ? true : false;
+            RightMouseButtonReleased = Input.GetMouseButtonUp(1) ? true : false;
+
+            ForwardButtonPressed = Input.GetButtonDown("Forward") ? true : false;
+            ForwardButtonHeldDown = Input.GetButton("Forward") ? true : false;
+            ForwardButtonReleased = Input.GetButtonUp("Forward") ? true : false;
+
+            BackwardButtonPressed = Input.GetButtonDown("Backward") ? true : false;
+            BackwardButtonHeldDown = Input.GetButton("Backward") ? true : false;
+            BackwardButtonReleased = Input.GetButtonUp("Backward") ? true : false;
+
+            LeftButtonPressed = Input.GetButtonDown("Left") ? true : false;
+            LeftButtonHeldDown = Input.GetButton("Left") ? true : false;
+            LeftButtonReleased = Input.GetButtonUp("Left") ? true : false;
+
+            RightButtonPressed = Input.GetButtonDown("Right") ? true : false;
+            RightButtonHeldDown = Input.GetButton("Right") ? true : false;
+            RightButtonReleased = Input.GetButtonUp("Right") ? true : false;
+
+
+            if (ForwardButtonHeldDown)
             {
                 playerRb.velocity = Vector3.ProjectOnPlane(camera.transform.forward, playerTransform.up) * speed;
             }
-            else if (Input.GetButton("Backward"))
+
+            if (BackwardButtonHeldDown)
             {
                 playerRb.velocity = Vector3.ProjectOnPlane(camera.transform.forward, playerTransform.up) * -1 * speed;
             }
-            else if (Input.GetButton("Left"))
+
+            if (LeftButtonHeldDown)
             {
                 playerRb.velocity = camera.transform.right * -1 * speed;
             }
-            else if (Input.GetButton("Right"))
+
+            if (RightButtonHeldDown)
             {
                 playerRb.velocity = camera.transform.right * speed;
             }
-
-            
-
-            leftMouseButtonHeldDown = Input.GetMouseButton(0) ? true : false;
-            leftMouseButonPressed = Input.GetMouseButtonDown(0) ? true : false;
-            leftMouseButtonReleased = Input.GetMouseButtonUp(0) ? true : false;
-            rightMouseButtonHeldDown = Input.GetMouseButton(1) ? true : false;
-            rightMouseButtonPressed = Input.GetMouseButtonDown(1) ? true : false;
-            rightMouseButtonReleased = Input.GetMouseButtonUp(1) ? true : false;
         }
     }
 }
