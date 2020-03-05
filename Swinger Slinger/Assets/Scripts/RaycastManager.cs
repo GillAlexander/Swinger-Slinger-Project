@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace Jonathan
 {
@@ -10,10 +11,15 @@ namespace Jonathan
         private Ray ray = default;
         private RaycastHit raycastHit = default;
         private ButtonController controller = default;
+        private Player player = default;
+        public static event Action playerIsInsideRange = default;
+        public static event Action<GameObject> objectToLift = default;
+
         void Start()
         {
             mainCamera = GetComponent<Camera>();
             controller = FindObjectOfType<ButtonController>();
+            player = FindObjectOfType<Player>();
         }
 
         void Update()
@@ -25,7 +31,15 @@ namespace Jonathan
                     UpdateRay();
                     if (Physics.Raycast(ray, out raycastHit))
                     {
-                        Debug.Log(raycastHit.transform.GetComponent<IInteractable>());
+                        if (raycastHit.transform.GetComponent<IInteractable>() != null && raycastHit.transform.GetComponent<Player>() == null)
+                        {
+                            var distance = player.transform.position - raycastHit.transform.position;
+                            Debug.Log(distance.magnitude);
+                            if (distance.magnitude < 3)
+                            {
+                                playerIsInsideRange?.Invoke();
+                            }
+                        }
                     }
                 }
             }

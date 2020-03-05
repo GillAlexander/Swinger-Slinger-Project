@@ -18,7 +18,7 @@ namespace Jonathan
             camera = FindObjectOfType<Camera>();
         }
 
-        void Update() // Lookover this shit
+        void FixedUpdate() // Lookover this shit
         {
             LeftMouseButtonHeldDown = Input.GetMouseButton(0) ? true : false;
             LeftMouseButonPressed = Input.GetMouseButtonDown(0) ? true : false;
