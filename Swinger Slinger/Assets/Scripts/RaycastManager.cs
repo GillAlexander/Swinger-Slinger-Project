@@ -13,7 +13,7 @@ namespace Jonathan
         private ButtonController controller = default;
         private Player player = default;
         public static event Action playerIsInsideRange = default;
-        public static event Action<GameObject> objectToLift = default;
+        public static event Action<GameObject> objectToAttach = default;
 
         void Start()
         {
@@ -31,13 +31,15 @@ namespace Jonathan
                     UpdateRay();
                     if (Physics.Raycast(ray, out raycastHit))
                     {
-                        if (raycastHit.transform.GetComponent<IInteractable>() != null && raycastHit.transform.GetComponent<Player>() == null)
+                        var transform = raycastHit.transform;
+                        if (transform.GetComponent<IInteractable>() != null && transform.GetComponent<Player>() == null)
                         {
-                            var distance = player.transform.position - raycastHit.transform.position;
+                            var distance = player.transform.position - transform.position;
                             Debug.Log(distance.magnitude);
                             if (distance.magnitude < 3)
                             {
                                 playerIsInsideRange?.Invoke();
+                                objectToAttach?.Invoke(transform.gameObject);
                             }
                         }
                     }
