@@ -6,10 +6,11 @@ namespace Jonathan
 {
     public class SpawnRope : MonoBehaviour
     {
-        [SerializeField] GameObject ropePrefab = default;
-        [SerializeField] GameObject ropeParent = default;
-        [SerializeField] float ropePartDistance = 0.1f;
+        [SerializeField] private GameObject ropePrefab = default;
+        [SerializeField] private GameObject ropeParent = default;
+
         [SerializeField] [Range(1, 50)] private int numberOfRopeParts = default;
+        [SerializeField] private ConfigurableJoint configurableJoint = default;
         private bool isRopeActive = false;
         private Vector3 ropePosition = default;
         private GameObject targetObject = null;
@@ -40,7 +41,19 @@ namespace Jonathan
         {
             if (!isRopeActive)
             {
-                GameObject ropePart = Instantiate(ropePrefab, targetObject.transform.position, targetObject.transform.rotation);
+                for (int i = 0; i < 1; i++)
+                {
+                    GameObject ropePart = Instantiate(ropePrefab, ropeParent.transform.position, ropeParent.transform.rotation);
+                    if (i == 1)
+                    {
+                        ropePart.name = $"Rope {i}";
+                        ropePart.transform.LookAt(transform);
+                    }
+                    else
+                    {
+
+                    }
+                }
 
                 isRopeActive = true;
             }
@@ -53,27 +66,27 @@ namespace Jonathan
 
         private void test()
         {
-            for (int i = 0; i < numberOfRopeParts; i++)
-            {
-                GameObject tmp;
+            //for (int i = 0; i < numberOfRopeParts; i++)
+            //{
+            //    GameObject tmp;
 
-                tmp = Instantiate(ropePrefab, new Vector3(ropePosition.x,
-                                                                     ropePosition.y + ropePartDistance * (i + 1),
-                                                                     ropePosition.z), Quaternion.identity, ropeParent.transform);
-                tmp.transform.eulerAngles = new Vector3(180, 0, 0);
+            //    //tmp = Instantiate(ropePrefab, new Vector3(ropePosition.x,
+            //    //                                                     ropePosition.y + ropePartDistance * (i + 1),
+            //    //                                                     ropePosition.z), Quaternion.identity, ropeParent.transform);
+            //    //tmp.transform.eulerAngles = new Vector3(180, 0, 0);
 
-                tmp.name = ropeParent.transform.childCount.ToString();
+            //    tmp.name = ropeParent.transform.childCount.ToString();
 
-                if (i == 0)
-                {
-                    Destroy(tmp.GetComponent<CharacterJoint>());
-                }
-                else
-                {
-                    tmp.GetComponent<CharacterJoint>().connectedBody =
-                        ropeParent.transform.Find((ropeParent.transform.childCount - 1).ToString()).GetComponent<Rigidbody>(); ;
-                }
-            }
+            //    if (i == 0)
+            //    {
+            //        Destroy(tmp.GetComponent<CharacterJoint>());
+            //    }
+            //    else
+            //    {
+            //        tmp.GetComponent<CharacterJoint>().connectedBody =
+            //            ropeParent.transform.Find((ropeParent.transform.childCount - 1).ToString()).GetComponent<Rigidbody>(); ;
+            //    }
+            //}
         }
     }
 }
