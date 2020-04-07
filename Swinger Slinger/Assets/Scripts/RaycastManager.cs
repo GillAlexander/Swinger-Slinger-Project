@@ -35,12 +35,16 @@ namespace Jonathan
                         if (transform.GetComponent<IInteractable>() != null && transform.GetComponent<Player>() == null)
                         {
                             var distance = player.transform.position - transform.position;
-                            Debug.Log(distance.magnitude);
+                            objectToAttach?.Invoke(transform.gameObject);
+
                             if (distance.magnitude < 3)
                             {
                                 playerIsInsideRange?.Invoke();
-                                objectToAttach?.Invoke(transform.gameObject);
                             }
+                        }
+                        else
+                        {
+                            objectToAttach?.Invoke(null);
                         }
                     }
                 }

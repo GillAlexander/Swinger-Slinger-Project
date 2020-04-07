@@ -9,21 +9,32 @@ namespace Jonathan
         private bool leftMouseButtonHeldDown = false;
         private bool leftMouseButonPressed = false;
         private bool leftMouseButtonReleased = false;
+
         private bool rightMouseButtonHeldDown = false;
         private bool rightMouseButtonPressed = false;
         private bool rightMouseButtonReleased = false;
+
         private bool forwardButtonHeldDown = false;
         private bool forwardButtonPressed = false;
         private bool forwardButtonReleased = false;
+
         private bool leftButtonHeldDown = false;
         private bool leftButtonPressed = false;
         private bool leftButtonReleased = false;
+
         private bool rightButtonHeldDown = false;
         private bool rightButtonPressed = false;
         private bool rightButtonReleased = false;
+
         private bool backwardButtonHeldDown = false;
         private bool backwardButtonPressed = false;
         private bool backwardButtonReleased = false;
+
+        private bool rotateRightButtonHeldDown = false;
+        private bool rotateRightButtonReleased = false;
+
+        private bool rotateLeftButtonHeldDown = false;
+        private bool rotateLeftButtonReleased = false;
 
         public bool LeftMouseButtonHeldDown { get => leftMouseButtonHeldDown; set => leftMouseButtonHeldDown = value; }
         public bool LeftMouseButonPressed { get => leftMouseButonPressed; set => leftMouseButonPressed = value; }
@@ -43,5 +54,9 @@ namespace Jonathan
         public bool BackwardButtonHeldDown{ get => backwardButtonHeldDown; set => backwardButtonHeldDown = value; }
         public bool BackwardButtonPressed{ get => backwardButtonPressed; set => backwardButtonPressed = value; }
         public bool BackwardButtonReleased{ get => backwardButtonReleased; set => backwardButtonReleased = value; }
+        public bool RotateRightButtonHeldDown { get => rotateRightButtonHeldDown; set => rotateRightButtonHeldDown = value; }
+        public bool RotateRightButtonReleased { get => rotateRightButtonReleased; set => rotateRightButtonReleased = value; }
+        public bool RotateLeftButtonHeldDown { get => rotateLeftButtonHeldDown; set => rotateLeftButtonHeldDown = value; }
+        public bool RotateLeftButtonReleased { get => rotateLeftButtonReleased; set => rotateLeftButtonReleased = value; }
     }
 }

@@ -4,18 +4,39 @@ using UnityEngine;
 
 namespace Jonathan
 {
-    public class PlayerController : ButtonController
+public class PlayerController : ButtonController
 {
+        [Header("Movement Settings")]
         [SerializeField] private float speed = default;
-        private Rigidbody playerRb = default;
+
+        [Header("Rotational Settings")]
+        [SerializeField] private float rotationSpeed = default;
+        [SerializeField] AnimationCurve rotationCurve = default;
+        private float rotationTime = 0;
+
+
+        private Rigidbody rigidBody = default;
         private Transform playerTransform = default;
         private Camera camera = default;
+        private RaycastManager raycastManager = default;
+        private int rotationDirection = 0;
+
+        private float rotationValue = 0;
+        public float RotationValue { get => rotationValue; set => rotationValue = value; }
+
+        public float RotationSpeed { get => rotationSpeed; }
 
         void Start()
         {
-            playerRb = GetComponent<Rigidbody>();
+            rigidBody = GetComponent<Rigidbody>();
             playerTransform = GetComponent<Transform>();
             camera = FindObjectOfType<Camera>();
+            RaycastManager.objectToAttach += RotatePlayer;
+        }
+
+        private void OnDisable()
+        {
+            RaycastManager.objectToAttach -= RotatePlayer;
         }
 
         void FixedUpdate() // Lookover this shit
@@ -43,26 +64,84 @@ namespace Jonathan
             RightButtonHeldDown = Input.GetButton("Right") ? true : false;
             RightButtonReleased = Input.GetButtonUp("Right") ? true : false;
 
+            RotateLeftButtonHeldDown = Input.GetKey(KeyCode.F) ? true : false;
+            RotateRightButtonHeldDown = Input.GetButton("LeftRotation") ? true : false;
 
-            if (ForwardButtonHeldDown)
+            RotateLeftButtonReleased = Input.GetKeyUp(KeyCode.F) ? true : false;
+            RotateRightButtonReleased = Input.GetButtonUp("RightRotation") ? true : false;
+
+
+            if (ForwardButtonHeldDown && RightButtonHeldDown)
             {
-                playerRb.velocity = Vector3.ProjectOnPlane(camera.transform.forward, playerTransform.up) * speed;
+                rigidBody.velocity = Vector3.ProjectOnPlane(camera.transform.forward + camera.transform.right, playerTransform.up) *  speed ;
+            }
+            else if (ForwardButtonHeldDown && LeftButtonHeldDown)
+            {
+                rigidBody.velocity = Vector3.ProjectOnPlane(camera.transform.forward + (camera.transform.right * -1), playerTransform.up) * speed;
+            }
+            else if (ForwardButtonHeldDown)
+            {
+                rigidBody.velocity = Vector3.ProjectOnPlane(camera.transform.forward, playerTransform.up) * speed;
+            }
+            else if (BackwardButtonHeldDown && RightButtonHeldDown)
+            {
+                rigidBody.velocity = Vector3.ProjectOnPlane(camera.transform.forward + (camera.transform.right * -1), playerTransform.up) * -1 * speed;
+            }
+            else if (BackwardButtonHeldDown && LeftButtonHeldDown)
+            {
+                rigidBody.velocity = Vector3.ProjectOnPlane(camera.transform.forward + camera.transform.right, playerTransform.up) * -1 * speed;
+            }
+            else if (RightButtonHeldDown)
+            {
+                rigidBody.velocity = camera.transform.right * speed;
+            }
+            else if (LeftButtonHeldDown)
+            {
+                 rigidBody.velocity = camera.transform.right * -1 * speed;
+            }
+            else if (BackwardButtonHeldDown)
+            {
+                rigidBody.velocity = Vector3.ProjectOnPlane(camera.transform.forward, playerTransform.up) * -1 * speed;
             }
 
-            if (BackwardButtonHeldDown)
+            if (RotateRightButtonHeldDown)
             {
-                playerRb.velocity = Vector3.ProjectOnPlane(camera.transform.forward, playerTransform.up) * -1 * speed;
+                rotationDirection = 1;
+            }
+            else if (RotateLeftButtonHeldDown)
+            {
+                rotationDirection = -1;
+            }
+            else
+            {
+                if (rotationTime < 0)
+                {
+                    rotationDirection = 1;
+                }
+                else if (rotationTime > 0)
+                {
+                    rotationDirection = -1;
+                }
+                else
+                rotationDirection = 0;
             }
 
-            if (LeftButtonHeldDown)
-            {
-                playerRb.velocity = camera.transform.right * -1 * speed;
-            }
+            rotationTime = Mathf.Clamp(rotationTime, -1, 1);
+            var evaluate = Mathf.Clamp(rotationTime += Time.deltaTime * rotationDirection, -1, 1);
+            rotationValue = rotationCurve.Evaluate(evaluate);
 
-            if (RightButtonHeldDown)
+            transform.rotation *= Quaternion.Euler(0, -1 * rotationSpeed * rotationValue, 0);
+
+        }
+
+        private void RotatePlayer(GameObject position)
+        {
+            if (position != null)
             {
-                playerRb.velocity = camera.transform.right * speed;
+                var pos = position.transform.position;
+                transform.LookAt(new Vector3(pos.x, 1, pos.z));
             }
         }
+
     }
 }
