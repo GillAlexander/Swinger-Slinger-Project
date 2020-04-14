@@ -12,10 +12,14 @@ namespace Jonathan
 
         [SerializeField] [Range(1, 50)] private int numberOfRopeParts = default;
         [SerializeField] private ConfigurableJoint configurableJoint = default;
-        public static bool isRopeActive = false;
-        private Vector3 ropePosition = default;
-        private GameObject targetObject = null;
+        private bool isRopeActive = false;
+        private bool objectIsAttached = false;
+        private List<Rigidbody> ropeRigidbodies = new List<Rigidbody>();
+        [SerializeField] private GameObject targetObject = null;
         private SoftJointLimitSpring joint = default;
+
+        public GameObject TargetObject { get => targetObject; set => targetObject = value; }
+        public bool IsRopeActive { get => isRopeActive; set => isRopeActive = value; }
 
         private void OnEnable()
         {
@@ -32,17 +36,21 @@ namespace Jonathan
         {
             if (target != null)
             {
-                targetObject = target;
-            }
-            else
-                targetObject = null;
+                if (!objectIsAttached)
+                {
+                    targetObject = target;
+                }
+                //else
+                //    targetObject = null;
 
-            RaycastManager.playerIsInsideRange += CreateRope;
+                RaycastManager.playerIsInsideRange += CreateRope;
+
+                objectIsAttached = true;
+            }
         }
 
         private void CreateRope()
         {
-
             StartCoroutine(BuildRope());
             return;
             List<Rigidbody> ropeList = new List<Rigidbody>();
@@ -93,8 +101,6 @@ namespace Jonathan
         {
             if (!isRopeActive)
             {
-                List<Rigidbody> ropeList = new List<Rigidbody>();
-
                 isRopeActive = true;
                 for (int i = 0; i < numberOfRopeParts; i++)
                 {
@@ -102,7 +108,7 @@ namespace Jonathan
                     Quaternion rotation = default;
                     Transform transform = ropeParent.transform;
 
-                    if (ropeList.Count == 0) // Äntligen :)
+                    if (ropeRigidbodies.Count == 0) // Äntligen :)
                     {
                         posX = ropeParent.transform.position.x;
                         posY = ropeParent.transform.position.y;
@@ -111,10 +117,10 @@ namespace Jonathan
                     }
                     else
                     {
-                        posX = ropeList[i - 1].transform.position.x;
-                        posY = ropeList[i - 1].transform.position.y;
-                        posZ = ropeList[i - 1].transform.position.z;
-                        rotation = ropeList[i - 1].transform.rotation;
+                        posX = ropeRigidbodies[i - 1].transform.position.x;
+                        posY = ropeRigidbodies[i - 1].transform.position.y;
+                        posZ = ropeRigidbodies[i - 1].transform.position.z;
+                        rotation = ropeRigidbodies[i - 1].transform.rotation;
                     }
 
                     GameObject ropePart = Instantiate(ropePrefab, new Vector3(posX, posY, posZ), rotation, transform);
@@ -123,7 +129,7 @@ namespace Jonathan
                     var joint = ropePart.GetComponent<ConfigurableJoint>();
                     var collider = ropePart.GetComponent<Collider>();
 
-                    ropeList.Add(ropePart.GetComponent<Rigidbody>());
+                    ropeRigidbodies.Add(ropePart.GetComponent<Rigidbody>());
                     //ropePart.transform.eulerAngles = new Vector3(270, 0, 0);
                     
 
@@ -135,22 +141,23 @@ namespace Jonathan
                     }
                     else
                     {
-                        joint.connectedBody = ropeList[i - 1];
-                        ropePart.transform.LookAt(ropeList[i - 1].transform);
+                        joint.connectedBody = ropeRigidbodies[i - 1];
+                        ropePart.transform.LookAt(ropeRigidbodies[i - 1].transform);
                     }
 
                     if (i == numberOfRopeParts - 1)
                     {
                         yield return new WaitForSeconds(0.05f);
-                        if (!targetObject.GetComponent<ConfigurableJoint>())
+                        if (targetObject != null && !targetObject.GetComponent<ConfigurableJoint>())
                         {
                             targetObject.AddComponent<ConfigurableJoint>();
+
+                            SetupConfigurableJoint();
                         }
                         
-                        SetupConfigurableJoint();
                         //targetObject.transform.eulerAngles = new Vector3(270, 0, 0);
-                        targetObject.transform.position = ropeList[i].position;
-                        targetObject.transform.rotation = ropeList[i].transform.rotation;
+                        targetObject.transform.position = ropeRigidbodies[i].position;
+                        targetObject.transform.rotation = ropeRigidbodies[i].transform.rotation;
                         targetObject.GetComponent<ConfigurableJoint>().connectedBody = ropePart.GetComponent<Rigidbody>();
                     }
                     yield return new WaitForSeconds(0.025f);
@@ -169,6 +176,7 @@ namespace Jonathan
             softJointLimitSpring.spring = 5;
             softJointLimitSpring.damper = 2;
             softJointLimit.limit = 3;
+
 
             var targetJoint = targetObject.GetComponent<ConfigurableJoint>();
 
@@ -189,6 +197,26 @@ namespace Jonathan
             targetJoint.angularXLimitSpring = softJointLimitSpring;
             targetJoint.angularYZLimitSpring = softJointLimitSpring;
             targetJoint.angularYLimit = softJointLimit;
+        }
+
+        public void ResetRope()
+        {
+            IsRopeActive = false;
+            targetObject = null;
+            objectIsAttached = false;
+
+            StartCoroutine(DestroyRope());
+        }
+
+        public IEnumerator DestroyRope()
+        {
+            for (int i = 0; i < ropeRigidbodies.Count; i++)
+            {
+                Destroy(ropeRigidbodies[i].gameObject);
+                ropeRigidbodies[i] = null;
+            }
+            ropeRigidbodies.Clear();
+            yield return null;
         }
     }
 }

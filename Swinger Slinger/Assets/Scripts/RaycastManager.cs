@@ -11,7 +11,9 @@ namespace Jonathan
         private Ray ray = default;
         private RaycastHit raycastHit = default;
         private ButtonController controller = default;
+        private SpawnRope spawnRope = null;
         private Player player = default;
+        private bool objectIsAttached = false;
         public static event Action playerIsInsideRange = default;
         public static event Action<GameObject> objectToAttach = default;
 
@@ -19,6 +21,7 @@ namespace Jonathan
         {
             mainCamera = GetComponent<Camera>();
             controller = FindObjectOfType<ButtonController>();
+            spawnRope = FindObjectOfType<SpawnRope>();
             player = FindObjectOfType<Player>();
         }
 
@@ -26,7 +29,7 @@ namespace Jonathan
         {
             if (Time.frameCount % 8 == 0) // Optimera mera
             {
-                if (controller.RightMouseButtonHeldDown)
+                if (controller.RightMouseButtonHeldDown && spawnRope.IsRopeActive == false)
                 {
                     UpdateRay();
                     if (Physics.Raycast(ray, out raycastHit))
@@ -40,6 +43,7 @@ namespace Jonathan
                             if (distance.magnitude < 3)
                             {
                                 playerIsInsideRange?.Invoke();
+                                objectIsAttached = true;
                             }
                         }
                         else

@@ -9,7 +9,6 @@ namespace Jonathan
         private bool inRotation = default;
         private float rotationSpeed = 0;
         private float rotationValue = 0;
-        public bool test = false;
 
         [SerializeField] private GameObject ropeParent = default;
         private ConfigurableJoint[] joints;
@@ -19,6 +18,7 @@ namespace Jonathan
         [SerializeField] private float throwDistance = 0;
         private SoftJointLimitSpring softJointLimitSpring = new SoftJointLimitSpring();
 
+        private SpawnRope spawnRope = null;
 
         [Header("Curve")]
         [SerializeField] AnimationCurve curve = default;
@@ -26,51 +26,65 @@ namespace Jonathan
 
         void Start()
         {
+            spawnRope = GetComponent<SpawnRope>();
+
             rotationSpeed = FindObjectOfType<PlayerController>().RotationSpeed;
             rotationValue = FindObjectOfType<PlayerController>().RotationValue;
         }
 
         void Update()
         {
-            Debug.Log(rotationValue);
-            
-            if (test)
+            if (spawnRope.IsRopeActive)
             {
-                CalculateRotationSpeed();
-                test = false;
-            }
-
-            if (GetComponent<PlayerController>().RotateRightButtonHeldDown)
-            {
-                if (joints == null)
-                    joints = ropeParent.GetComponentsInChildren<ConfigurableJoint>();
-
-                timeUntilMaxRopeTension += Time.deltaTime;
-                if (timeUntilMaxRopeTension < 3)
+                if (GetComponent<PlayerController>().RotateRightButtonHeldDown || GetComponent<PlayerController>().RotateLeftButtonHeldDown)
                 {
-                    var value = curve.Evaluate(timeUntilMaxRopeTension);
-                    Debug.Log(value);
-                    softJointLimitSpring.spring += (5 * value);
+                    if (joints == null)
+                        joints = ropeParent.GetComponentsInChildren<ConfigurableJoint>();
 
-                    for (int i = 0; i < joints.Length; i++)
+                    timeUntilMaxRopeTension += Time.deltaTime;
+                    if (timeUntilMaxRopeTension < 3)
                     {
-                        joints[i].angularYZLimitSpring = softJointLimitSpring;
+                        var value = curve.Evaluate(timeUntilMaxRopeTension);
+
+                        softJointLimitSpring.spring += (5 * value);
+
+                        for (int i = 0; i < joints.Length; i++)
+                        {
+                            joints[i].angularYZLimitSpring = softJointLimitSpring;
+                        }
                     }
                 }
-            }
-            else
-            {
-                if (joints != null)
+                else
                 {
-                    softJointLimitSpring.spring = 5;
-
-                    for (int i = 0; i < joints.Length; i++)
+                    if (joints != null)
                     {
-                        joints[i].angularYZLimitSpring = softJointLimitSpring;
-                    }
-                }
+                        softJointLimitSpring.spring = 5;
 
-                timeUntilMaxRopeTension = 0;
+                        for (int i = 0; i < joints.Length; i++)
+                        {
+                            joints[i].angularYZLimitSpring = softJointLimitSpring;
+                        }
+                    }
+
+                    timeUntilMaxRopeTension = 0;
+                }
+            }
+
+        }
+
+        public void DetachAttachedObject()
+        {
+            if(spawnRope.TargetObject != null && spawnRope.IsRopeActive)
+            {
+                Debug.Log("Detach Object");
+                for (int i = 0; i < joints.Length; i++)
+                {
+                    joints[i] = null;
+                }
+                joints = null;
+                Destroy(spawnRope.TargetObject.GetComponent<ConfigurableJoint>());
+                spawnRope.TargetObject.GetComponent<Rigidbody>().AddForce((spawnRope.transform.forward * 10) + Vector3.up * 5 , ForceMode.Impulse);
+                spawnRope.ResetRope();
             }
         }
 

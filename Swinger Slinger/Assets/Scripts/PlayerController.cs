@@ -14,11 +14,11 @@ public class PlayerController : ButtonController
         [SerializeField] AnimationCurve rotationCurve = default;
         private float rotationTime = 0;
 
-
         private Rigidbody rigidBody = default;
         private Transform playerTransform = default;
         private Camera camera = default;
-        private RaycastManager raycastManager = default;
+        private RaycastManager raycastManager = null;
+        private RopeMechanics ropeMechanics = null;
         private int rotationDirection = 0;
 
         private float rotationValue = 0;
@@ -31,6 +31,7 @@ public class PlayerController : ButtonController
             rigidBody = GetComponent<Rigidbody>();
             playerTransform = GetComponent<Transform>();
             camera = FindObjectOfType<Camera>();
+            ropeMechanics = GetComponent<RopeMechanics>();
             RaycastManager.objectToAttach += RotatePlayer;
         }
 
@@ -124,6 +125,11 @@ public class PlayerController : ButtonController
                 }
                 else
                 rotationDirection = 0;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                ropeMechanics.DetachAttachedObject();
             }
 
             rotationTime = Mathf.Clamp(rotationTime, -1, 1);
